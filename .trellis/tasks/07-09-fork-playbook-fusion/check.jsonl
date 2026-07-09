@@ -1,0 +1,5 @@
+{"file": ".trellis/spec/cli/unit-test/conventions.md", "reason": "pb.test.ts 必须遵守项目测试约定"}
+{"file": ".trellis/spec/cli/unit-test/integration-patterns.md", "reason": "门禁行为矩阵测试（execa 跑 python）参照集成测试模式"}
+{"file": ".trellis/spec/cli/backend/workflow-state-contract.md", "reason": "验证 workflow.md 插入后 breadcrumb 契约与测试不变量仍成立"}
+{"file": ".trellis/spec/cli/backend/quality-guidelines.md", "reason": "review 触点代码与新模块是否符合质量标准与禁用模式"}
+{"file": ".trellis/spec/cli/backend/script-conventions.md", "reason": "review pb_gate.py 是否符合脚本规范"}

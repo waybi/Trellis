@@ -1,0 +1,5 @@
+{"file": ".trellis/spec/cli/backend/script-conventions.md", "reason": "pb_gate.py 必须遵守 .trellis/scripts 的 Python 规范（类型、结构、CLI 适配）"}
+{"file": ".trellis/spec/cli/backend/workflow-state-contract.md", "reason": "workflow.md 的 4 处指针插入不得破坏 breadcrumb 解析器契约（标签语法、状态写入方）"}
+{"file": ".trellis/spec/cli/backend/directory-structure.md", "reason": "新增模板文件（pb-* skills、pb_gate.py）的目录组织必须符合模块布局约定"}
+{"file": ".trellis/spec/cli/backend/quality-guidelines.md", "reason": "代码标准与禁用模式，约束 task.py/task_store.py 触点插入的写法"}
+{"file": "/Users/waybi/Desktop/topgames/topbi/docs/guides/feature-delivery-playbook.md", "reason": "方法论原文：pb-adversarial-review / pb-harvest / pb-find-precedent 三个 skill 的内容源（阶段3/6/7/10、反模式表、三条动作线）"}

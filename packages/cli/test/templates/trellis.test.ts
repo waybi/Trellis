@@ -129,7 +129,12 @@ describe("trellis template constants", () => {
     expect(workflowMdTemplate).toContain("#");
   });
 
-  it("marketplace native workflow mirror matches the bundled workflow", () => {
+  // pb: skipped in fork (waybi/Trellis my-workflow) — the bundled workflow.md
+  // intentionally diverges from the upstream marketplace mirror (pb pointer
+  // insertions), and the mirror lives in mindfold-ai's marketplace submodule
+  // which this fork cannot update. Known divergence, documented in
+  // .trellis/tasks/07-09-fork-playbook-fusion/design.md.
+  it.skip("marketplace native workflow mirror matches the bundled workflow", () => {
     const repoRoot = fs.existsSync(path.join(process.cwd(), "marketplace"))
       ? process.cwd()
       : path.resolve(process.cwd(), "../..");

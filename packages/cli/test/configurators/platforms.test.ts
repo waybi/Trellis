@@ -43,6 +43,9 @@ import {
 } from "../../src/configurators/shared.js";
 
 const BUNDLED_SKILL_NAMES = [
+  // pb: fork-owned bundled skills (waybi/Trellis my-workflow)
+  "pb-adversarial-review",
+  "pb-harvest",
   "trellis-channel",
   "trellis-meta",
   "trellis-session-insight",
@@ -499,7 +502,10 @@ describe("configurePlatform", () => {
         ).length,
     );
     for (const dir of skillDirs) {
-      expect(dir.name.startsWith("trellis-")).toBe(true);
+      // pb: fork-owned skills use the pb- prefix (waybi/Trellis my-workflow)
+      expect(
+        dir.name.startsWith("trellis-") || dir.name.startsWith("pb-"),
+      ).toBe(true);
       expect(fs.existsSync(path.join(skillsDir, dir.name, "SKILL.md"))).toBe(
         true,
       );

@@ -253,6 +253,9 @@ const SKILL_DESCRIPTIONS: Record<string, string> = {
     "Deep bug analysis to break the fix-forget-repeat cycle. Analyzes root cause category, why fixes failed, prevention mechanisms, and captures knowledge into specs. Use after fixing a bug to prevent the same class of bugs.",
   "update-spec":
     "Captures executable contracts and coding conventions into .trellis/spec/ documents. Use when learning something valuable from debugging, implementing, or discussion that should be preserved for future sessions.",
+  // pb: fork-owned skill (waybi/Trellis my-workflow)
+  "pb-find-precedent":
+    "Finds precedents before designing: in-repo precedent with mandatory isomorphism check, external precedent via research, or an explicit de-novo declaration recorded as evidence. Use during planning when a feature may have existing structure to reuse, before committing to a fresh design.",
 };
 
 /**

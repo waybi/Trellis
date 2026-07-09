@@ -108,3 +108,11 @@ channel:
 #
 # codex:
 #   dispatch_mode: inline  # or "sub-agent" to dispatch trellis-* sub-agents
+
+#-------------------------------------------------------------------------------
+# Playbook Gates (fork: waybi/Trellis my-workflow)
+#-------------------------------------------------------------------------------
+# pb:begin
+playbook:
+  gates: true    # 复杂任务的 spec-review / harvest 硬门禁；false 则全部放行
+# pb:end

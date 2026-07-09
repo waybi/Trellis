@@ -194,6 +194,7 @@ Load `trellis-brainstorm`; stay in planning.
 Lightweight: `prd.md` can be enough. Complex: finish `prd.md`, `design.md`, and `implement.md`; ask for review before `task.py start`.
 Multi-deliverable scope: consider a parent task plus independently verifiable child tasks; dependencies must be written in child artifacts, not implied by tree position.
 Sub-agent mode: curate `implement.jsonl` and `check.jsonl` as spec/research manifests before start.
+复杂任务：`task.py start` 前需 `spec-review.md`（对抗审查证据，load `pb-adversarial-review`）；找先例 load `trellis-pb-find-precedent`（三路输出，de-novo 须显式宣告）。
 [/workflow-state:planning]
 
 <!-- Per-turn breadcrumb: shown throughout Phase 1 when codex.dispatch_mode=inline.
@@ -207,6 +208,7 @@ Load `trellis-brainstorm`; stay in planning.
 Lightweight: `prd.md` can be enough. Complex: finish `prd.md`, `design.md`, and `implement.md`; ask for review before `task.py start`.
 Multi-deliverable scope: consider a parent task plus independently verifiable child tasks; dependencies must be written in child artifacts, not implied by tree position.
 Inline mode: skip jsonl curation; Phase 2 reads artifacts/specs via `trellis-before-dev`.
+复杂任务：`task.py start` 前需 `spec-review.md`（对抗审查证据，load `pb-adversarial-review`）；找先例 load `trellis-pb-find-precedent`（三路输出，de-novo 须显式宣告）。
 [/workflow-state:planning-inline]
 
 ### Phase 2: Execute
@@ -224,9 +226,10 @@ Sub-agent dispatch protocol applies to all platforms and all sub-agents, includi
 
 [workflow-state:in_progress]
 Tools: `trellis-implement` / `trellis-research` are sub-agent types only (Task/Agent tool, NOT Skill; there is no skill by these names). `trellis-update-spec` is a skill. `trellis-check` exists as both; prefer the Agent form when verifying after code changes.
-Flow: `trellis-implement` -> `trellis-check` -> `trellis-update-spec` -> commit (Phase 3.4) -> `/trellis:finish-work`.
+Flow: `trellis-implement` -> `trellis-check` -> `trellis-update-spec` -> `pb-harvest` -> commit (Phase 3.4) -> `/trellis:finish-work`.
 Main-session default: dispatch implement/check sub-agents. Sub-agent self-exemption: if already running as `trellis-implement`, do NOT spawn another `trellis-implement` or `trellis-check`; if already running as `trellis-check`, do NOT spawn another `trellis-check` or `trellis-implement`. Dispatch is main session only.
 Dispatch prompt starts with `Active task: <task path from task.py current>`. Read context: jsonl entries -> `prd.md` -> `design.md if present` -> `implement.md if present`.
+若 `.trellis/spec/guides/delivery.md` 存在，commit/push 必须遵守（pb 交付纪律）。
 [/workflow-state:in_progress]
 
 <!-- Per-turn breadcrumb: shown while status='in_progress' when
@@ -235,9 +238,10 @@ Dispatch prompt starts with `Active task: <task path from task.py current>`. Rea
      instead of dispatching sub-agents. -->
 
 [workflow-state:in_progress-inline]
-Flow: `trellis-before-dev` -> edit -> `trellis-check` -> validation -> `trellis-update-spec` -> commit (Phase 3.4) -> `/trellis:finish-work`.
+Flow: `trellis-before-dev` -> edit -> `trellis-check` -> validation -> `trellis-update-spec` -> `pb-harvest` -> commit (Phase 3.4) -> `/trellis:finish-work`.
 Do not dispatch implement/check sub-agents in inline mode.
 Read context: `prd.md` -> `design.md if present` -> `implement.md if present`, plus relevant spec/research loaded by skills.
+若 `.trellis/spec/guides/delivery.md` 存在，commit/push 必须遵守（pb 交付纪律）。
 [/workflow-state:in_progress-inline]
 
 ### Phase 3: Finish
@@ -447,6 +451,8 @@ After this command succeeds, the breadcrumb auto-switches to `[workflow-state:in
 
 If `task.py start` errors with a session-identity message (no context key from hook input, `TRELLIS_CONTEXT_ID`, or platform-native session env), follow the hint in the error to set up session identity, then retry.
 
+复杂任务门禁：`task.py start` 会校验任务目录下的 `spec-review.md` 对抗审查证据（load `pb-adversarial-review` 产出）；紧急放行用环境变量 `PB_SKIP_GATE=1`（打印警告留痕）。 <!-- pb:gate -->
+
 #### 1.5 Completion criteria
 
 | Condition | Required |
@@ -584,6 +590,8 @@ Load the `trellis-update-spec` skill and review whether this task produced new k
 - New technical decisions
 
 Update the docs under `.trellis/spec/` accordingly. Even if the conclusion is "nothing to update", walk through the judgment.
+
+Harvest：随后 load `pb-harvest` 按分拣决策树沉淀（skill / lore 或 spec / 先例资产 / memory / 无收获显式宣告），产出任务目录 `harvest.md` — 复杂任务 `task.py archive` 会校验该证据。 <!-- pb:gate -->
 
 #### 3.4 Commit changes `[required · once]`
 

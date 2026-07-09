@@ -84,6 +84,10 @@ def cmd_start(args: argparse.Namespace) -> int:
         print("Hint: Use task name (e.g., 'my-task') or full path (e.g., '.trellis/tasks/01-31-my-task')")
         return 1
 
+    # pb:gate — playbook 规约对抗审查门禁（见 common/pb_gate.py）
+    from common.pb_gate import check_start_gate
+    if (reason := check_start_gate(full_path, repo_root)): print(colored(reason, Colors.RED)); return 1
+
     # Convert to relative path for storage
     try:
         task_dir = full_path.relative_to(repo_root).as_posix()

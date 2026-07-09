@@ -62,6 +62,8 @@ export const commonTrellisConfig = readTemplate(
   "scripts/common/trellis_config.py",
 );
 export const commonSafeCommit = readTemplate("scripts/common/safe_commit.py");
+// pb:gate — playbook gates module (fork: waybi/Trellis my-workflow)
+export const commonPbGate = readTemplate("scripts/common/pb_gate.py");
 
 // Python scripts - main
 export const getDeveloperScript = readTemplate("scripts/get_developer.py");
@@ -113,6 +115,8 @@ export function getAllScripts(): Map<string, string> {
   scripts.set("common/workflow_phase.py", commonWorkflowPhase);
   scripts.set("common/trellis_config.py", commonTrellisConfig);
   scripts.set("common/safe_commit.py", commonSafeCommit);
+  // pb:gate — register so `trellis update` syncs the gate module
+  scripts.set("common/pb_gate.py", commonPbGate);
 
   // Main
   scripts.set("get_developer.py", getDeveloperScript);

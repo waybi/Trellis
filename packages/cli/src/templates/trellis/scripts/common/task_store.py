@@ -455,6 +455,10 @@ def cmd_archive(args: argparse.Namespace) -> int:
             print(f"  - {t.dir_name}/", file=sys.stderr)
         return 1
 
+    # pb:gate — playbook harvest 门禁（见 common/pb_gate.py）
+    from .pb_gate import check_archive_gate
+    if (reason := check_archive_gate(task_dir, repo_root)): print(colored(reason, Colors.RED), file=sys.stderr); return 1
+
     dir_name = task_dir.name
     task_json_path = task_dir / FILE_TASK_JSON
 

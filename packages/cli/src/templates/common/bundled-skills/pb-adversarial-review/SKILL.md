@@ -1,6 +1,6 @@
 ---
 name: pb-adversarial-review
-description: Adversarial review of planning artifacts (prd/design/implement) for complex tasks before task.py start. Produces the spec-review.md evidence file required by the playbook start gate. Two-level fallback - L1 multi-model fusion toolchain, L2 trellis channel native reviewers.
+description: Adversarial review of planning artifacts (prd/design/implement) for complex tasks before task.py start. Produces the spec-review.md evidence file required by the playbook start gate. Two-level fallback - L1 multi-model fusion toolchain (must detect availability first), L2 fresh-context reviewers via trellis channel or platform-native sub-agents.
 ---
 
 # pb-adversarial-review
@@ -21,23 +21,30 @@ description: Adversarial review of planning artifacts (prd/design/implement) for
 
 ## L1 / L2 选择决策树
 
+**第 0 步（必做，不可跳过）：检测 L1 可用性。** 检查你的可用 skill / 命令列表里是否有 `fusion`（或用户声明的等价多模型评审工具），把结果如实记入证据文件的 `l1-available:` 行。不检测就直接选 L2 属于**静默降级，违规**。
+
 ```
-本机是否有 fusion 多模型工具链（或等价的多模型评审工具）？
-├── 有 → L1：用 fusion 对规划三件套跑多模型对抗审查
-│         （多个异构模型并行挑刺，覆盖面最大）
-└── 没有 → L2：trellis channel 原生对抗审查（人人可用，零额外依赖）
-          ├── 本机有多个 provider（claude + codex 等）
-          │     → Pattern C parallel reviewers：每个 provider spawn 一个
-          │       fresh check worker，并行对抗
-          └── 只有单一 provider
-                → fresh-context 补偿：spawn 多个同 provider worker，
-                  各分配不同攻击视角（见 references/l2-channel-review.md）
+可用 skill 列表里有 fusion（或等价多模型评审工具）？
+├── 有 → 必须走 L1：用 fusion 对规划三件套跑多模型对抗审查
+│         （异构模型并行挑刺，跨模型家族盲区互补，覆盖面最大）
+│         确需降级（fusion 探活失败 / 超时 / 中途挂）
+│           → 允许转 L2，但必须在证据文件写明降级原因
+└── 没有 → L2：fresh-context 对抗审查（人人可用，零额外依赖）
+          载体二选一，证据文件必须如实写实际用的哪种：
+          ├── trellis channel：Pattern C parallel reviewers，
+          │   每个 provider spawn 一个 fresh check worker 并行对抗
+          │   （见 references/l2-channel-review.md）
+          └── 平台原生 sub-agent（如 Claude Code 的 Task/Agent 工具）：
+              spawn ≥2 个 fresh-context 评审 agent，
+              各分配不同攻击视角 + opposition brief
 ```
+
+L2 的本质要求是**独立上下文 + 对抗指令 + 视角划分**——channel 和平台原生 sub-agent 都是合格载体；同会话自审不是。
 
 规则：
 
-- **降级合规，静默跳过违规。** 没有 fusion 就走 L2；连 channel 都不可用才允许人工逐条走查——但同样必须产出 `spec-review.md`。任何情况下不允许"我看着没问题"直接 start。
-- **门禁验证据不验工具。** `pb_gate.py` 只检查 `spec-review.md` 的结构，不感知你用了什么工具。证据文件如实声明 `review-level` 和 `providers` 即可。
+- **降级合规，静默跳过违规。** L1 不可用就走 L2，但"不可用"必须是第 0 步检测过的事实，不是默认假设；连 L2 都不可用才允许人工逐条走查——但同样必须产出 `spec-review.md`。任何情况下不允许"我看着没问题"直接 start。
+- **门禁验证据不验工具。** `pb_gate.py` 只检查 `spec-review.md` 的结构，不感知你用了什么工具。证据文件如实声明 `review-level`、`l1-available` 和实际载体即可。
 - 审查对象是规约本身（prd/design/implement），不是代码。代码审查走上游 check 流程。
 
 ## 证据文件契约（摘要）

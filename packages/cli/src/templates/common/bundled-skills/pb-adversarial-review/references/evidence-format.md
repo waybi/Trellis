@@ -18,7 +18,9 @@
 
 ```markdown
 review-level: L1
+l1-available: yes（可用 skill 列表检测到 fusion）| no（未检测到 fusion 或等价工具）| yes-degraded（检测到但探活失败/超时，降级 L2，原因：<...>）
 providers: fusion (claude, codex, gemini)
+mechanism: fusion | trellis-channel | platform-sub-agent
 date: <YYYY-MM-DD>
 inputs: prd.md, design.md, implement.md
 
@@ -26,7 +28,7 @@ inputs: prd.md, design.md, implement.md
 
 ## 审查方式
 
-<一两句：L1 fusion 几个模型 / L2 channel 几个 worker、各自视角>
+<一两句：L1 fusion 几个模型 / L2 几个 fresh-context worker（channel 或原生 sub-agent）、各自视角>
 
 ## 决议
 
@@ -47,7 +49,9 @@ inputs: prd.md, design.md, implement.md
 
 ## 字段说明
 
-- `review-level`：`L1` = fusion 多模型工具链；`L2` = trellis channel 原生（含单 provider fresh-context 补偿）。如实声明，降级合规。
+- `review-level`：`L1` = fusion 多模型工具链；`L2` = fresh-context 对抗审查（trellis channel 或平台原生 sub-agent，含单 provider 视角划分补偿）。如实声明，降级合规。
+- `l1-available`：**必填**。L1 可用性的检测结果（检测方法：查可用 skill/命令列表里是否有 `fusion` 或等价多模型评审工具）。`l1-available: yes` 却写 `review-level: L2` 时必须附降级原因——没有原因 = 静默降级，违规。
+- `mechanism`：实际使用的载体，如实填写。用了平台原生 sub-agent 就写 `platform-sub-agent`，不要笼统写成 channel。
 - `providers`：实际参与的模型/provider 列表。L2 单 provider 时写明视角划分，如 `providers: claude x3 (data-contract / acceptance / edge-cases)`。
 - 决议标记语义：
   - `✅` 接受——问题成立，规约已修改（写明改到哪）

@@ -23,19 +23,26 @@ describe("pb templates: asset discovery", () => {
     expect(names).toContain("pb-find-precedent");
   });
 
-  it("getBundledSkillTemplates discovers pb-adversarial-review with 5 files", () => {
+  it("getBundledSkillTemplates discovers pb-adversarial-review skill and core reference files", () => {
     const skill = getBundledSkillTemplates().find(
       (s) => s.name === "pb-adversarial-review",
     );
     expect(skill).toBeDefined();
-    const paths = (skill?.files ?? []).map((f) => f.relativePath).sort();
-    expect(paths).toEqual([
+    const paths = new Set(
+      (skill?.files ?? []).map((f) => f.relativePath),
+    );
+    // Auto-discovery only; asserts the layered-review reference files exist
+    // (mere presence, not an execution guarantee). Exact file count is owned
+    // by the skill (Step 2) and may still change as references are finalized.
+    for (const required of [
       "SKILL.md",
+      "references/round-protocol.md",
+      "references/fusion-howto.md",
+      "references/draft-template.md",
       "references/attack-checklist.md",
-      "references/delivery-gerrit-example.md",
-      "references/evidence-format.md",
-      "references/l2-channel-review.md",
-    ]);
+    ]) {
+      expect(paths.has(required), `skill must ship ${required}`).toBe(true);
+    }
   });
 
   it("getBundledSkillTemplates discovers pb-harvest with 4 files", () => {
@@ -190,6 +197,12 @@ describe("pb gates: behavior matrix (python)", () => {
   const VALID_REVIEW =
     "review-level: L2\nproviders: claude\n\n## 决议\n- ✅ chain 隔离 — 已在 §3 收紧\n";
   const VALID_HARVEST = "## 分拣\n- skill: 无\n- lore-or-spec: 一条坑\n";
+  // The three per-layer review files a complex task must carry post-migration.
+  const THREE_REVIEWS = {
+    "prd-review.md": VALID_REVIEW,
+    "design-review.md": VALID_REVIEW,
+    "implement-review.md": VALID_REVIEW,
+  };
 
   it("lightweight task (no design.md) passes both gates without evidence", () => {
     const taskDir = makeTask("light", { "prd.md": "goal" });
@@ -201,17 +214,19 @@ describe("pb gates: behavior matrix (python)", () => {
   it("complex task without evidence is blocked on both gates", () => {
     const taskDir = makeTask("complex", { "prd.md": "goal", "design.md": "d" });
     writeConfig("true");
+    // Start gate now requires the three per-layer review files; with none
+    // present it names the first missing one (prd-review.md).
     expect(runGate("start", taskDir)).toContain("GATE_BLOCK");
-    expect(runGate("start", taskDir)).toContain("spec-review.md");
+    expect(runGate("start", taskDir)).toContain("prd-review.md");
     expect(runGate("archive", taskDir)).toContain("GATE_BLOCK");
     expect(runGate("archive", taskDir)).toContain("harvest.md");
   });
 
-  it("complex task with valid evidence passes both gates", () => {
+  it("complex task with all three per-layer reviews passes the start gate", () => {
     const taskDir = makeTask("complex-ok", {
       "prd.md": "goal",
       "design.md": "d",
-      "spec-review.md": VALID_REVIEW,
+      ...THREE_REVIEWS,
       "harvest.md": VALID_HARVEST,
     });
     writeConfig("true");
@@ -219,17 +234,70 @@ describe("pb gates: behavior matrix (python)", () => {
     expect(runGate("archive", taskDir)).toContain("GATE_PASS");
   });
 
-  it("structural violations are rejected individually", () => {
+  it("complex task missing implement-review is blocked and names it", () => {
+    const taskDir = makeTask("miss-implement", {
+      "design.md": "d",
+      "prd-review.md": VALID_REVIEW,
+      "design-review.md": VALID_REVIEW,
+    });
     writeConfig("true");
+    const out = runGate("start", taskDir);
+    expect(out).toContain("GATE_BLOCK");
+    expect(out).toContain("implement-review.md");
+  });
+
+  it("grandfather: legacy spec-review.md alone passes the start gate", () => {
+    // Pre-migration tasks built under the old single-round system carry
+    // spec-review.md and are not retroactively required to produce three
+    // files (design.md-and-implement-review.md migration IB1).
+    const taskDir = makeTask("grandfather", {
+      "design.md": "d",
+      "spec-review.md": VALID_REVIEW,
+    });
+    writeConfig("true");
+    expect(runGate("start", taskDir)).toContain("GATE_PASS");
+  });
+
+  it("grandfather takes priority when spec-review coexists with three reviews", () => {
+    const taskDir = makeTask("coexist", {
+      "design.md": "d",
+      "spec-review.md": VALID_REVIEW,
+      ...THREE_REVIEWS,
+    });
+    writeConfig("true");
+    expect(runGate("start", taskDir)).toContain("GATE_PASS");
+  });
+
+  it("grandfather passes even when the three-file set is incomplete", () => {
+    // Only spec-review + a stray prd-review: spec-review short-circuits before
+    // the three-file check, so an incomplete three-set never blocks a
+    // grandfathered task.
+    const taskDir = makeTask("grandfather-incomplete", {
+      "design.md": "d",
+      "spec-review.md": VALID_REVIEW,
+      "prd-review.md": VALID_REVIEW,
+    });
+    writeConfig("true");
+    expect(runGate("start", taskDir)).toContain("GATE_PASS");
+  });
+
+  it("structural violations in per-layer reviews are rejected individually", () => {
+    writeConfig("true");
+    // Missing review-level line in one of the three files → blocked on it.
     const noLevel = makeTask("no-level", {
       "design.md": "d",
-      "spec-review.md": "## 决议\n- ✅ ok\n",
+      "prd-review.md": VALID_REVIEW,
+      "design-review.md": VALID_REVIEW,
+      "implement-review.md": "## 决议\n- ✅ ok\n",
     });
     expect(runGate("start", noLevel)).toContain("review-level");
 
+    // Missing resolution marker in one of the three files → blocked on it.
     const noResolution = makeTask("no-resolution", {
       "design.md": "d",
-      "spec-review.md": "review-level: L1\n## 决议\n(空)\n",
+      "prd-review.md": VALID_REVIEW,
+      "design-review.md": VALID_REVIEW,
+      "implement-review.md": "review-level: L1\n## 决议\n(空)\n",
     });
     expect(runGate("start", noResolution)).toContain("resolution");
 

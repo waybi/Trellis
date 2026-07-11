@@ -1,0 +1,2 @@
+{"file": ".trellis/spec/cli/unit-test/conventions.md", "reason": "pb.test.ts 用例遵守测试约定"}
+{"file": ".trellis/spec/cli/backend/workflow-state-contract.md", "reason": "验证 breadcrumb 契约不被破坏"}

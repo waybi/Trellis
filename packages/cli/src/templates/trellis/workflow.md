@@ -194,7 +194,7 @@ Load `trellis-brainstorm`; stay in planning.
 Lightweight: `prd.md` can be enough. Complex: finish `prd.md`, `design.md`, and `implement.md`; ask for review before `task.py start`.
 Multi-deliverable scope: consider a parent task plus independently verifiable child tasks; dependencies must be written in child artifacts, not implied by tree position.
 Sub-agent mode: curate `implement.jsonl` and `check.jsonl` as spec/research manifests before start.
-复杂任务：`task.py start` 前需 `spec-review.md`（对抗审查证据，load `pb-adversarial-review`）；找先例 load `trellis-pb-find-precedent`（三路输出，de-novo 须显式宣告）。
+复杂任务：每层（prd/design/implement）都叫 fusion 挑一轮再定稿（初稿→fusion 挑刺→终稿，load `pb-adversarial-review`），产出 prd-review/design-review/implement-review。门禁只验审查文件在不在，质量靠 fusion+人把关、顺序靠自觉——不是机器验证。找先例 load `trellis-pb-find-precedent`（三路输出，de-novo 须显式宣告）。
 [/workflow-state:planning]
 
 <!-- Per-turn breadcrumb: shown throughout Phase 1 when codex.dispatch_mode=inline.
@@ -208,7 +208,7 @@ Load `trellis-brainstorm`; stay in planning.
 Lightweight: `prd.md` can be enough. Complex: finish `prd.md`, `design.md`, and `implement.md`; ask for review before `task.py start`.
 Multi-deliverable scope: consider a parent task plus independently verifiable child tasks; dependencies must be written in child artifacts, not implied by tree position.
 Inline mode: skip jsonl curation; Phase 2 reads artifacts/specs via `trellis-before-dev`.
-复杂任务：`task.py start` 前需 `spec-review.md`（对抗审查证据，load `pb-adversarial-review`）；找先例 load `trellis-pb-find-precedent`（三路输出，de-novo 须显式宣告）。
+复杂任务：每层（prd/design/implement）都叫 fusion 挑一轮再定稿（初稿→fusion 挑刺→终稿，load `pb-adversarial-review`），产出 prd-review/design-review/implement-review。门禁只验审查文件在不在，质量靠 fusion+人把关、顺序靠自觉——不是机器验证。找先例 load `trellis-pb-find-precedent`（三路输出，de-novo 须显式宣告）。
 [/workflow-state:planning-inline]
 
 ### Phase 2: Execute
@@ -451,7 +451,7 @@ After this command succeeds, the breadcrumb auto-switches to `[workflow-state:in
 
 If `task.py start` errors with a session-identity message (no context key from hook input, `TRELLIS_CONTEXT_ID`, or platform-native session env), follow the hint in the error to set up session identity, then retry.
 
-复杂任务门禁：`task.py start` 会校验任务目录下的 `spec-review.md` 对抗审查证据（load `pb-adversarial-review` 产出）；紧急放行用环境变量 `PB_SKIP_GATE=1`（打印警告留痕）。 <!-- pb:gate -->
+复杂任务门禁：`task.py start` 校验任务目录下每层对抗审查证据 `prd-review.md` / `design-review.md` / `implement-review.md`（load `pb-adversarial-review` 分层产出）；只验存在+结构、不验质量。旧任务有 `spec-review.md` 则 grandfather 放行。紧急放行用环境变量 `PB_SKIP_GATE=1`（打印警告留痕）。 <!-- pb:gate -->
 
 #### 1.5 Completion criteria
 

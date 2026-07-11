@@ -59,7 +59,7 @@ trellis channel spawn spec-review-<slug> --agent check \
 # 之后同上：send 各自的 brief → wait --all → messages 收结论
 ```
 
-单 provider 的 `spec-review.md` 里如实写 `providers: <provider> x2 (contract / acceptance)`。
+单 provider 的该层挑刺记录（`prd-review.md` / `design-review.md` / `implement-review.md`）里如实写 `providers: <provider> x2 (contract / acceptance)`。
 
 ## Opposition brief 模板
 
@@ -90,7 +90,7 @@ worker 的产出是**问题清单**，不是决议。主会话必须：
 1. 合并去重全部 worker 的问题。
 2. 逐条定 ✅ / ❌ / ⏳——`❌` 反驳必须 grep 代码/配置坐实，不许"我觉得不会"。
 3. `✅` 项改回规划三件套，形成规约 v2。
-4. 按 `evidence-format.md` 写 `spec-review.md`。
+4. 按 `review-record-template.md` 写该层挑刺记录（`prd-review.md` / `design-review.md` / `implement-review.md`）。
 5. 有 Blocker 级 ✅ 决议时，建议对改后的规约再跑一轮轻量确认。
 
 ## 反模式

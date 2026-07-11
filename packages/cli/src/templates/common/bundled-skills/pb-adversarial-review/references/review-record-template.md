@@ -57,6 +57,18 @@ inputs: <本层被审文档 + 不变量 + 证据引用>
   - `❌` 反驳——问题不成立，**必须附证据**（grep / 文件:行号 / 用户原话），"我以为"不算证据
   - `⏳` 存疑——暂无法定论，写明验证计划；含 Blocker 级 ⏳ 时不应定稿
 
+## design-review 额外要求："声明 vs grep 实际"核对
+
+design 里若有"改命中集"§（带影响面三件），design-review **必须记 fusion 对每条的核对结论**（见 `attack-checklist.md` 2b）：
+
+```markdown
+## 改命中集 § 影响面核对
+
+- C3 — 声明 hit-set={PAY, Delivery_Pay} vs grep 实际命中 60 处/15 action_type：
+  声明命中 ✅ 对得上；preserve-set 里 Attribute_Revenue_*_PAY 反向 grep 未命中主 pattern ✅ 无误伤
+  变体重跑：加空格 `* 0.7` 重跑 → 新增命中 0 处 ✅ / 或"炸出 N 处漏网 → Blocker"
+```
+
 ## implement-review 额外要求：引用 design 发现（防复读）
 
 `implement-review.md` 除逐条决议外，**必须显式引用 design 轮发现并标注**，防止退化成复制 design 的发现：
@@ -70,6 +82,21 @@ inputs: <本层被审文档 + 不变量 + 证据引用>
 ```
 
 这是"强制轮次耦合、防复读"，不是机器验质量——没有任何机器会校验这段引用的真伪，靠人把关。
+
+### 断言对账（改命中集 §）
+
+若 design 有"改命中集"§，`implement-review.md` 还要做一次**断言对账**：design 每条 preserve-set 声明的**关键子串**（字段名 / 公式片段）→ 反查 implement 的真实 test，**必须字面出现在某条 assert 里**。缺失、或降级成 `toBeDefined()` 这类空断言 = **Blocker**。
+
+```markdown
+## 断言对账（改命中集 preserve-set）
+
+- C3 preserve-set 关键子串 'sum($pay_money*0.7)'（Attribute_Revenue_Install_PAY 不变）
+  → foo.test.ts:88 `expect(expr).toContain('sum($pay_money*0.7)')` ✅ 字面命中
+- C3 preserve-set 'PAY_BLACK 公式不变'
+  → 未找到对应断言 ❌ Blocker：保留集无真实测试守护
+```
+
+这条对账靠人核，机器不校验子串真伪；它把"声明保留却没测试守护"从隐性漏洞变成显式 Blocker。
 
 ## 迁移兼容（grandfather）
 

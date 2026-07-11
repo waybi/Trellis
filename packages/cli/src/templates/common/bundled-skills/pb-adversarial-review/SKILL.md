@@ -34,6 +34,19 @@ prd / design / implement **各自独立走一轮** 初稿 → fusion 挑刺 → 
 
 **implement 轮特殊要求（防复读）**：implement 轮只攻 design 未覆盖的**独有项**（执行顺序 / 回滚 / 验证充分性）。为防退化成复制 design 的发现，implement 的挑刺记录**必须显式引用 design 轮发现并标注 采纳 / 反驳 / 独有**。这是"防复读、强制轮次耦合"，不是机器验质量。
 
+## 影响面动作锁（治"没意识到是批量改动"）
+
+三层打磨管**组织**（契约写得严不严谨）；动作锁管**救命**（有没有真去核对影响面）。二者是两回事——上次真 bug（全局替换 `sum($pay_money*0.7)` 误伤 15 个 action_type、254 处）正是"契约意图有、影响面核对无"：就算写了"只 PAY/Delivery_Pay"，没人 grep 那 15 个，review 照样过。
+
+治法是一条前置铁规矩 + 三道复查，串起来：
+
+1. **grep 前置**（design，`round-protocol.md`）：碰到"已存在、会被别处引用的东西"（公式/字段/符号/switch 分发分支），动手改前**无脑先 grep**看散布——不是"觉得危险才查"，绕开"没意识到危险"的死结。命中跨多处 → "改命中集"§。
+2. **影响面三件**（design，`draft-template.md`）：改命中集 § 必带 ① grep 原始输出+变体清单+命中总数 ② hit-set vs preserve-set + 反向 grep ③ preserve-set 断言关键子串。缺一件该 § 交不了。
+3. **fusion 复查**（`attack-checklist.md` 2b）：对每条改命中集 § 核"声明 vs grep 实际"，并用作者没试的等价 pattern 抽查重跑 ≥1 次炸漏网命中。
+4. **断言对账**（implement-review，`review-record-template.md`）：design 保留集的关键子串必须字面出现在真实 test 的 assert 里；缺失或空断言 = Blocker。
+
+**诚实边界**：这套**降低**"影响面没核对"类 bug，**不消除**。**无机器门禁**——implement 轮 fusion 已裁定门禁靠 agent 自打标记触发，而"没意识到是批量改动"正是 bug 根源→不打标记→门禁沉默→拦截率≈0 且制造伪安全感（比不加更危险）。真杠杆是 grep 前置逼意识 + fusion/人复查；grep 完整性最终机器保证不了，靠 fusion 变体抽查 + 人。
+
 ## fusion 载体
 
 - **优先 fusion**：跨厂商多家模型**并行**挑刺（如 opus + agnes + minimax），**主会话当 arbiter** 融合各家、逐条走查。跨模型家族盲区互补，覆盖面最大。
@@ -55,7 +68,8 @@ prd / design / implement **各自独立走一轮** 初稿 → fusion 挑刺 → 
 
 | 意图 | 读 |
 |---|---|
-| 每层四步怎么走（初稿→自证→挑刺→终稿） | `references/round-protocol.md` |
+| 每层四步怎么走（初稿→自证→挑刺→终稿）+ grep 前置铁规矩与"改命中集"判定边界 | `references/round-protocol.md` |
+| 改动一批现有对象时的影响面动作锁（grep 前置→三件→复查→断言对账） | 本页「影响面动作锁」段 + `round-protocol.md` / `draft-template.md` / `attack-checklist.md` / `review-record-template.md` |
 | 一键跑跨厂商 fusion 的实操（并行调用 / 探活 / 降级留痕） | `references/fusion-howto.md` |
 | 写每层初稿（不变量区 + 证据自证区） | `references/draft-template.md` |
 | 写 / 校验三份挑刺记录 | `references/review-record-template.md` |

@@ -81,14 +81,14 @@ export interface UpdateOptions {
   migrate?: boolean;
 }
 
-interface FileChange {
+export interface FileChange {
   path: string;
   relativePath: string;
   newContent: string;
   status: "new" | "unchanged" | "changed";
 }
 
-interface ChangeAnalysis {
+export interface ChangeAnalysis {
   newFiles: FileChange[];
   unchangedFiles: FileChange[];
   autoUpdateFiles: FileChange[]; // Template updated, user didn't modify
@@ -836,7 +836,7 @@ async function collectRegistrySpecTemplates(
   return result.files;
 }
 
-async function collectTemplateFiles(
+export async function collectTemplateFiles(
   cwd: string,
   extraPlatforms?: Set<AITool>,
   /**
@@ -944,7 +944,7 @@ async function collectTemplateFiles(
  * - User didn't modify + template updated = auto-update (autoUpdateFiles)
  * - User modified = needs confirmation (changedFiles)
  */
-function analyzeChanges(
+export function analyzeChanges(
   cwd: string,
   hashes: TemplateHashes,
   templates: Map<string, string>,

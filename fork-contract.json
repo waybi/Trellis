@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "upstreamBaseline": "v0.6.6",
+  "features": [
+    {
+      "id": "pb-gates",
+      "description": "Start and archive gates for complex playbook tasks",
+      "ownedPaths": [
+        "packages/cli/src/templates/trellis/scripts/common/pb_gate.py"
+      ],
+      "integrationPaths": [
+        "packages/cli/src/templates/trellis/scripts/task.py",
+        "packages/cli/src/templates/trellis/scripts/common/task_store.py",
+        "packages/cli/src/templates/trellis/index.ts",
+        "packages/cli/src/templates/trellis/config.yaml"
+      ],
+      "tests": [
+        "packages/cli/test/templates/pb.test.ts"
+      ]
+    },
+    {
+      "id": "pb-review-and-harvest",
+      "description": "Layered fusion review, precedent search, and harvest skills",
+      "ownedPaths": [
+        "packages/cli/src/templates/common/bundled-skills/pb-adversarial-review/SKILL.md",
+        "packages/cli/src/templates/common/bundled-skills/pb-adversarial-review/references/attack-checklist.md",
+        "packages/cli/src/templates/common/bundled-skills/pb-adversarial-review/references/delivery-gerrit-example.md",
+        "packages/cli/src/templates/common/bundled-skills/pb-adversarial-review/references/draft-template.md",
+        "packages/cli/src/templates/common/bundled-skills/pb-adversarial-review/references/fusion-howto.md",
+        "packages/cli/src/templates/common/bundled-skills/pb-adversarial-review/references/l2-channel-review.md",
+        "packages/cli/src/templates/common/bundled-skills/pb-adversarial-review/references/review-record-template.md",
+        "packages/cli/src/templates/common/bundled-skills/pb-adversarial-review/references/round-protocol.md",
+        "packages/cli/src/templates/common/bundled-skills/pb-harvest/SKILL.md",
+        "packages/cli/src/templates/common/bundled-skills/pb-harvest/references/harvest-format.md",
+        "packages/cli/src/templates/common/bundled-skills/pb-harvest/references/precedent-report.md",
+        "packages/cli/src/templates/common/bundled-skills/pb-harvest/references/skill-extraction.md",
+        "packages/cli/src/templates/common/skills/pb-find-precedent.md"
+      ],
+      "integrationPaths": [
+        "packages/cli/src/configurators/shared.ts",
+        "packages/cli/src/templates/trellis/workflow.md"
+      ],
+      "tests": [
+        "packages/cli/test/templates/pb.test.ts"
+      ]
+    }
+  ]
+}

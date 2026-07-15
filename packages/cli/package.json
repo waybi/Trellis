@@ -21,6 +21,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "test:fork": "vitest run test/templates/pb.test.ts test/scripts/fork-verifier.test.ts test/templates/fork-generation.test.ts test/commands/fork-update-preservation.test.ts",
     "lint": "eslint src/ test/",
     "lint:fix": "eslint src/ test/ --fix",
     "format": "prettier --write src/",
